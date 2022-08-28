@@ -17,6 +17,7 @@ func ConnectToMongoDb() (*mongo.Database, error) {
 	mongoDbPassword := os.Getenv("MONGO_DB_PASSWORD")
 	mongoDbHost := os.Getenv("MONGO_DB_HOST")
 	mongoDbPort := os.Getenv("MONGO_DB_PORT")
+	mongoDBName := os.Getenv("MONGO_DB_NAME")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -27,7 +28,7 @@ func ConnectToMongoDb() (*mongo.Database, error) {
 		return nil, err
 	}
 
-	database := client.Database("go_pos")
+	database := client.Database(mongoDBName)
 	if err := database.Client().Ping(ctx, readpref.Primary()); err != nil {
 	}
 
