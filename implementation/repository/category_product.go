@@ -6,6 +6,7 @@ import (
 
 	"github.com/sinulingga23/go-pos/domain"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -42,4 +43,24 @@ func (c *categoryProductRepository) Create(ctx context.Context, categoryProduct 
 	}
 
 	return createdCategoryProduct, nil
+}
+
+func (c *categoryProductRepository) FindById(ctx context.Context, id primitive.ObjectID) (
+	*domain.CategoryProduct,
+	error,
+) {
+	collection := c.database.Collection(CategoryProductCollection)
+	singleResult := collection.FindOne(ctx, bson.D{
+		bson.E{Key: "_id", Value: id},
+	})
+	if err := singleResult.Err(); err != nil {
+		return nil, err
+	}
+
+	currentCategoryProduct := &domain.CategoryProduct{}
+	if err := singleResult.Decode(currentCategoryProduct); err != nil {
+		return nil, err
+	}
+
+	return currentCategoryProduct, nil
 }
