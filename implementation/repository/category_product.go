@@ -64,3 +64,33 @@ func (c *categoryProductRepository) FindById(ctx context.Context, id primitive.O
 
 	return currentCategoryProduct, nil
 }
+
+func (c *categoryProductRepository) UpdateByID(ctx context.Context, id primitive.ObjectID, categoryProduct domain.CategoryProduct) (
+	*domain.CategoryProduct,
+	error,	
+) {
+	collection := c.database.Collection(CategoryProductCollection)
+	updateResult, err := collection.UpdateByID(ctx, id, bson.D{
+		bson.E{Key: "$set", Value: categoryProduct},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if updateResult.MatchedCount != 1 {
+		log.Printf("[INCONSISTENT]: %s\n", "There are is a something's wrong.")
+	}
+	
+	singleResult := collection.FindOne(ctx, bson.D{
+		bson.E{Key: "_id", Value: id},
+	})
+	if err := singleResult.Err(); err != nil {
+		return nil, err
+	}
+
+	updatedCategoryProduct := &domain.CategoryProduct{}
+	if err := singleResult.Decode(updatedCategoryProduct); err != nil {
+		return nil, err
+	}
+
+	return updatedCategoryProduct, nil
+}
