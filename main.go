@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/sinulingga23/go-pos/config"
-	"github.com/sinulingga23/go-pos/implementation/repository"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func main() {
@@ -25,15 +23,4 @@ func main() {
 			log.Printf("[DATABASE]: %s", err.Error())
 		}
 	}()
-
-	cpn := repository.NewCategoryProductRepository(database)
-	id, err := primitive.ObjectIDFromHex("630c65518b08ac4fd1bd6d83")
-	if err != nil {
-		log.Printf("[DATABASE]: %s", err.Error())
-	}
-	currentCategoryProduct, err := cpn.FindById(ctx, id)
-	if err != nil {
-		log.Printf("[DATABASE]: %s", err.Error())
-	}
-	log.Printf("[RESULT]: %v\n", currentCategoryProduct)
 }
