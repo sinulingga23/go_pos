@@ -30,6 +30,7 @@ func (c *categoryProductRepository) Create(ctx context.Context, categoryProduct 
 	collection := c.database.Collection(CategoryProductCollection)
 	result, err := collection.InsertOne(ctx, categoryProduct)
 	if err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -41,6 +42,7 @@ func (c *categoryProductRepository) Create(ctx context.Context, categoryProduct 
 	createdCategoryProduct := &domain.CategoryProduct{}
 	if err := singleResult.Decode(createdCategoryProduct); err != nil {
 		log.Printf("[DATABASE]: %s", err.Error())
+		return nil, err
 	}
 
 	return createdCategoryProduct, nil
@@ -55,11 +57,13 @@ func (c *categoryProductRepository) FindById(ctx context.Context, id primitive.O
 		bson.E{Key: "_id", Value: id},
 	})
 	if err := singleResult.Err(); err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 
 	currentCategoryProduct := &domain.CategoryProduct{}
 	if err := singleResult.Decode(currentCategoryProduct); err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -75,9 +79,11 @@ func (c *categoryProductRepository) UpdateByID(ctx context.Context, id primitive
 		bson.E{Key: "$set", Value: categoryProduct},
 	})
 	if err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 	if updateResult.MatchedCount != 1 {
+		log.Printf("[DATABASE]: %s\n", "There are is a something's wrong.")
 		return nil, errors.New("There are is a something's wrong.")
 	}
 	
@@ -85,11 +91,13 @@ func (c *categoryProductRepository) UpdateByID(ctx context.Context, id primitive
 		bson.E{Key: "_id", Value: id},
 	})
 	if err := singleResult.Err(); err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 
 	updatedCategoryProduct := &domain.CategoryProduct{}
 	if err := singleResult.Decode(updatedCategoryProduct); err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -104,10 +112,12 @@ func (c *categoryProductRepository) DeleteById(ctx context.Context, id primitive
 		bson.E{Key: "_id", Value: id},
 	})
 	if err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return err
 	}
 	
 	if deleteResult.DeletedCount != 1 {
+		log.Printf("[DATABASE]: %s\n", "There are is a something's wrong.")
 		return errors.New("There are is a something's wrong.")
 	}
 
@@ -125,6 +135,7 @@ func (c *categoryProductRepository) FindByIds(ctx context.Context, ids []primiti
 		},
 	})
 	if err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 	defer cursor.Close(ctx)
@@ -133,11 +144,13 @@ func (c *categoryProductRepository) FindByIds(ctx context.Context, ids []primiti
 	for cursor.Next(ctx) {
 		currentCategoryProduct := &domain.CategoryProduct{}
 		if err := cursor.Decode(currentCategoryProduct); err != nil {
+			log.Printf("[DATABASE]: %s\n", err.Error())
 			return nil, err
 		}
 		categoryProducts = append(categoryProducts, currentCategoryProduct)
 	}
 	if err := cursor.Err(); err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
 	}
 
