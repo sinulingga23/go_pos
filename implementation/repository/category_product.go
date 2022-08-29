@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/sinulingga23/go-pos/domain"
@@ -77,7 +78,7 @@ func (c *categoryProductRepository) UpdateByID(ctx context.Context, id primitive
 		return nil, err
 	}
 	if updateResult.MatchedCount != 1 {
-		log.Printf("[INCONSISTENT]: %s\n", "There are is a something's wrong.")
+		return nil, errors.New("There are is a something's wrong.")
 	}
 	
 	singleResult := collection.FindOne(ctx, bson.D{
@@ -93,4 +94,52 @@ func (c *categoryProductRepository) UpdateByID(ctx context.Context, id primitive
 	}
 
 	return updatedCategoryProduct, nil
+}
+
+func (c *categoryProductRepository) DeleteById(ctx context.Context, id primitive.ObjectID) (
+	error,
+) {
+	collection := c.database.Collection(CategoryProductCollection)
+	deleteResult, err := collection.DeleteOne(ctx, bson.D{
+		bson.E{Key: "_id", Value: id},
+	})
+	if err != nil {
+		return err
+	}
+	
+	if deleteResult.DeletedCount != 1 {
+		return errors.New("There are is a something's wrong.")
+	}
+
+	return nil
+}
+
+func (c *categoryProductRepository) FindByIds(ctx context.Context, ids []primitive.ObjectID) (
+	[]*domain.CategoryProduct,
+	error,
+) {
+	collection := c.database.Collection(CategoryProductCollection)
+	cursor, err := collection.Find(ctx, bson.M{
+		"_id": bson.M{
+			"$in": ids,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	categoryProducts := make([]*domain.CategoryProduct, 0)
+	for cursor.Next(ctx) {
+		currentCategoryProduct := &domain.CategoryProduct{}
+		if err := cursor.Decode(currentCategoryProduct); err != nil {
+			return nil, err
+		}
+		categoryProducts = append(categoryProducts, currentCategoryProduct)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return categoryProducts, nil
 }

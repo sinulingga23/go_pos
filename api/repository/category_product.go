@@ -11,4 +11,6 @@ type CategoryProductRepository interface {
 	Create(ctx context.Context, categoryProduct domain.CategoryProduct) (*domain.CategoryProduct, error)
 	FindById(ctx context.Context, id primitive.ObjectID) (*domain.CategoryProduct, error)
 	UpdateById(ctx context.Context, id primitive.ObjectID, categoryProduct domain.CategoryProduct) (*domain.CategoryProduct, error)
+	DeleteById(ctx context.Context, id primitive.ObjectID) error
+	FindByIds(ctx context.Context, ids []primitive.ObjectID) ([]*domain.CategoryProduct, error)
 }
