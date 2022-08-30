@@ -156,3 +156,32 @@ func (c *categoryProductRepository) FindByIds(ctx context.Context, ids []primiti
 
 	return categoryProducts, nil
 }
+
+func (c *categoryProductRepository) FindAll(ctx context.Context) (
+	[]*domain.CategoryProduct,
+	error,
+) {
+	collection := c.database.Collection(CategoryProductCollection)
+	cursor, err := collection.Find(ctx, struct {}{})
+	if err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	categoryProducts := make([]*domain.CategoryProduct, 0)
+	for cursor.Next(ctx) {
+		categoryProduct := &domain.CategoryProduct{}
+		if err := cursor.Decode(categoryProduct); err != nil {
+			log.Printf("[DATABASE]: %s\n", err.Error())
+			return nil, err
+		}
+		categoryProducts = append(categoryProducts, categoryProduct)
+	}
+	if err := cursor.Err(); err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
+		return nil, err
+	}
+
+	return categoryProducts, nil
+}
