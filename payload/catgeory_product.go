@@ -11,4 +11,10 @@ type (
 		CategoryName string `json:"categoryName"`
 		Description string `json:"description"`
 	}
+
+	UpdateCategoryProductRequest struct {
+		Id string `json:"id"`
+		CategoryName string `json:"categoryName"`
+		Description string `json:"description"`
+	}
 )

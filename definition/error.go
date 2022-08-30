@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	ErrDataNotFound = errors.New("Daya not found.")
+	ErrDataNotFound = errors.New("Data not found.")
 	ErrBadRequest = errors.New("Bad request.")
 	ErrInternalServer = errors.New("Can't process this request at the moment.")
 )

@@ -5,5 +5,7 @@ import (
 )
 
 type CategoryProductService interface {
-	Create(CreateCategoryProductRequest payload.CreateCategoryProductRequest) (*payload.CategoryProduct, error)
+	Create(createCategoryProductRequest payload.CreateCategoryProductRequest) (*payload.CategoryProduct, error)
+	FindById(id string) (*payload.CategoryProduct, error)
+	UpdateById(id string, updateCategoryProductRequest payload.UpdateCategoryProductRequest) (*payload.CategoryProduct, error)
 }
