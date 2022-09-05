@@ -123,3 +123,43 @@ func (c *categoryProductService) UpdateById(id string, updateCategoryProductRequ
 		Description: updateCategoryProductRequest.Description,
 	}, nil
 }
+
+func (c *categoryProductService) DeleteById(id string) error {
+	idOID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return definition.ErrBadRequest
+	}
+	
+	deletedCount, err := c.categoryProductRepository.DeleteById(context.TODO(), idOID)
+	if err != nil {
+		return definition.ErrInternalServer
+	}
+
+	if deletedCount == 0 {
+		return definition.ErrDataNotFound
+	}
+
+	return nil
+}
+
+func (c *categoryProductService) FindAll() ([]*payload.CategoryProduct, error) {
+	categoryProducts, err := c.categoryProductRepository.FindAll(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*payload.CategoryProduct, 0)
+	for _,categoryProduct := range categoryProducts {
+		result = append(result, &payload.CategoryProduct{
+			Id: categoryProduct.Id.String(),
+			CategoryName: categoryProduct.CategoryName,
+			Description: categoryProduct.Description,
+		})
+	}
+
+	if len(result) == 0 {
+		return nil, definition.ErrDataNotFound
+	}
+
+	return result, nil
+}

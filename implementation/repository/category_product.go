@@ -102,6 +102,7 @@ func (c *categoryProductRepository) UpdateById(ctx context.Context, id primitive
 }
 
 func (c *categoryProductRepository) DeleteById(ctx context.Context, id primitive.ObjectID) (
+	int64,
 	error,
 ) {
 	collection := c.database.Collection(CategoryProductCollection)
@@ -110,15 +111,10 @@ func (c *categoryProductRepository) DeleteById(ctx context.Context, id primitive
 	})
 	if err != nil {
 		log.Printf("[DATABASE]: %s\n", err.Error())
-		return err
-	}
-	
-	if deleteResult.DeletedCount != 1 {
-		log.Printf("[DATABASE]: %s\n", "There are is a something's wrong.")
-		return errors.New("There are is a something's wrong.")
+		return 0, err
 	}
 
-	return nil
+	return deleteResult.DeletedCount, nil
 }
 
 func (c *categoryProductRepository) FindByIds(ctx context.Context, ids []primitive.ObjectID) (
