@@ -8,10 +8,10 @@ RUN set -ex; \
 WORKDIR /usr/src/app
 
 COPY go.mod go.sum ./
-RUN go mod download && go mod verify
+RUN go mod download && go mod verify && go clean -testcache
 
 COPY . .
 
-RUN CGO_ENABLED=0
+RUN CGO_ENABLED=0;
 
 CMD ["go", "test", "-v", "./implementation/repository/..."]
