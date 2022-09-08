@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"strings"
 	"testing"
 
@@ -17,6 +18,11 @@ func TestCategoryProductRepository_Create_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
+	_, err = database.Collection(CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	categoryRepository := NewCategoryProductRepository(database)
 
 	wantCategoryName := "Elektronik"
