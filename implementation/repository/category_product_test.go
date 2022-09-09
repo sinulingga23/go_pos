@@ -130,3 +130,53 @@ func TestCategoryProductRepository_FindById_NotExists(t *testing.T) {
 		log.Fatalf("got %q want %q\n", err2.Error(), wantError2.Error())
 	}
 }
+
+func TestCategoryProductRepository_UpdateById_Success(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	
+	_, err = database.Collection(CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	categoryProductRepository := NewCategoryProductRepository(database)
+
+	wantId := primitive.NewObjectID()
+	wantCategoryName := "Fashion"
+	wantDescription := "Semua kebutuhan fashionmu ada disini!."
+
+
+	createdCategoryProduct, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: wantId,
+		CategoryName: "Pakaian",
+		Description: "Semua kebutuhan pakaian ada di sini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	updatedCategoryProduct, err := categoryProductRepository.UpdateById(ctx, createdCategoryProduct.Id, domain.CategoryProduct{
+		Id: createdCategoryProduct.Id,
+		CategoryName: "Fashion",
+		Description: "Semua kebutuhan fashionmu ada disini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if strings.Compare(wantId.String(), updatedCategoryProduct.Id.String()) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct.Id.String(), wantId.String())
+	}
+
+	if strings.Compare(wantCategoryName, updatedCategoryProduct.CategoryName) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct.CategoryName, wantCategoryName)
+	}
+
+	if strings.Compare(wantDescription, updatedCategoryProduct.Description) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct.Description, wantDescription)
+	}
+}
