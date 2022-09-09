@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  mongodb_test:
+    container_name: mongodb_test
+    image: mongo:6.0.1
+    restart: always
+    volumes:
+      - mongodb_test:/home/db/mongo
+  backend_test:
+    container_name: backend_test
+    depends_on:
+      - mongodb_test
+    build:
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env_test
+      
+volumes:
+  mongodb_test:

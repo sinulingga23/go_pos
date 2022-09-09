@@ -1,1 +1,2 @@
-.env
+.env_production
+.env_test
