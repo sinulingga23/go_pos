@@ -384,3 +384,80 @@ func TestCategoryProductRepository_FindByIds_Success(t *testing.T) {
 		log.Fatalf("got %q want %q\n", categoryProducts[4].Description, wantDescription5)
 	}
 }
+
+func TestCategoryProductRepository_FindAll_Success(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	categoryProductRepository := NewCategoryProductRepository(database)
+
+	createdCategoryProduct1, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Pakaian",
+		Description: "Semua kebutuhan pakaian ada di sini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct2, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		CategoryName: "Fashion",
+		Description: "Semua kebutuhan fashionmu ada disini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct3, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Otomotif",
+		Description: "Tempat yang tepat untuk mencari kebutuhan otomotifmu.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct4, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Pinjaman",
+		Description: "Bayar semua pinjamanmu di sini!.",
+	})
+
+	createdCategoryProduct5, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Kesehatan",
+		Description: "Menyediakan berbagai produk kesehatan.",
+	})
+
+	wantCategoryProducts := []*domain.CategoryProduct{
+		createdCategoryProduct1,
+		createdCategoryProduct2,
+		createdCategoryProduct3, 
+		createdCategoryProduct4,
+		createdCategoryProduct5,
+	}
+	wantLengthData := len(wantCategoryProducts)
+
+	cetegoryProducts, err := categoryProductRepository.FindAll(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if wantLengthData != len(cetegoryProducts) {
+		log.Fatalf("got %q want %q\n", len(cetegoryProducts), wantLengthData)
+	}
+
+	for i := 0; i < len(cetegoryProducts); i++ {
+		if strings.Compare(wantCategoryProducts[i].Id.String(), cetegoryProducts[i].Id.String()) != 0 {
+			log.Fatalf("got %q want %q\n", cetegoryProducts[i].Id.String(), wantCategoryProducts[i].Id.String())
+		}
+	}
+}
