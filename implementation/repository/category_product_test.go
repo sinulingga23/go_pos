@@ -227,3 +227,57 @@ func TestCategoryProductRepository_UpdateById_NotExists(t *testing.T) {
 		log.Fatalf("got %q want %q\n", err2.Error(), wantError2.Error())
 	}
 }
+
+func TestCategoryProductRepository_DeleteById(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	var wantDeletedCount1 int64 = 1
+	var wantDeletedCount2 int64 = 1
+
+	categoryProductRepository := NewCategoryProductRepository(database)
+
+	createdCategoryProduct1, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Pinjaman",
+		Description: "Bayar semua pinjamanmu di sini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct2, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Otomotif",
+		Description: "Tempat yang tepat untuk mencari kebutuhan otomotifmu.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	deletedCount1, err := categoryProductRepository.DeleteById(ctx, createdCategoryProduct1.Id)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	deletedCount2, err := categoryProductRepository.DeleteById(ctx, createdCategoryProduct2.Id)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if wantDeletedCount1 != deletedCount1 {
+		log.Fatalf("got %q want %q\n", deletedCount1, wantDeletedCount1)
+	}
+
+	if wantDeletedCount2 != deletedCount2 {
+		log.Fatalf("got %q want %q\n", deletedCount2, wantDeletedCount2)
+	}
+}
