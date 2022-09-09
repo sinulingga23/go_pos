@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"log"
 
 	"github.com/sinulingga23/go-pos/domain"
@@ -72,16 +71,12 @@ func (c *categoryProductRepository) FindById(ctx context.Context, id primitive.O
 
 func (c *categoryProductRepository) UpdateById(ctx context.Context, id primitive.ObjectID, categoryProduct domain.CategoryProduct) (*domain.CategoryProduct, error) {
 	collection := c.database.Collection(CategoryProductCollection)
-	updateResult, err := collection.UpdateByID(ctx, id, bson.D{
+	_, err := collection.UpdateByID(ctx, id, bson.D{
 		bson.E{Key: "$set", Value: categoryProduct},
 	})
 	if err != nil {
 		log.Printf("[DATABASE]: %s\n", err.Error())
 		return nil, err
-	}
-	if updateResult.MatchedCount != 1 {
-		log.Printf("[DATABASE]: %s\n", "There are is a something's wrong.")
-		return nil, errors.New("There are is a something's wrong.")
 	}
 	
 	singleResult := collection.FindOne(ctx, bson.D{

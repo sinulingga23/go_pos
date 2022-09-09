@@ -143,11 +143,11 @@ func TestCategoryProductRepository_UpdateById_Success(t *testing.T) {
 		log.Fatal(err.Error())
 	}
 
-	categoryProductRepository := NewCategoryProductRepository(database)
-
 	wantId := primitive.NewObjectID()
 	wantCategoryName := "Fashion"
 	wantDescription := "Semua kebutuhan fashionmu ada disini!."
+
+	categoryProductRepository := NewCategoryProductRepository(database)
 
 
 	createdCategoryProduct, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
@@ -178,5 +178,52 @@ func TestCategoryProductRepository_UpdateById_Success(t *testing.T) {
 
 	if strings.Compare(wantDescription, updatedCategoryProduct.Description) != 0 {
 		log.Fatalf("got %q want %q\n", updatedCategoryProduct.Description, wantDescription)
+	}
+}
+
+func TestCategoryProductRepository_UpdateById_NotExists(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	wantError1 := mongo.ErrNoDocuments
+	wantError2 := mongo.ErrNoDocuments
+
+	categoryProductRepository := NewCategoryProductRepository(database)
+
+	createdCategoryProduct, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Pakaian",
+		Description: "Semua kebutuhan pakaian ada di sini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err1 := categoryProductRepository.UpdateById(ctx, primitive.NewObjectID(), domain.CategoryProduct{
+		Id: createdCategoryProduct.Id,
+		CategoryName: "Fashion",
+		Description: "Semua kebutuhan fashionmu ada disini!.",
+	})
+
+	_, err2 := categoryProductRepository.UpdateById(ctx, primitive.ObjectID{}, domain.CategoryProduct{
+		Id: createdCategoryProduct.Id,
+		CategoryName: "Fashion",
+		Description: "Semua kebutuhan fashionmu ada disini!.",
+	})
+
+	if wantError1 != err1 {
+		log.Fatalf("got %q want %q\n", err1.Error(), wantError1.Error())
+	}
+
+	if wantError2 != err2 {
+		log.Fatalf("got %q want %q\n", err2.Error(), wantError2.Error())
 	}
 }
