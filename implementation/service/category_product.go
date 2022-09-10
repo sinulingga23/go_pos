@@ -46,7 +46,7 @@ func (c *categoryProductService) Create(createCategoryProductRequest payload.Cre
 	}
 
 	return &payload.CategoryProduct{
-		Id: categoryProduct.Id.String(),
+		Id: categoryProduct.Id.Hex(),
 		CategoryName: categoryProduct.CategoryName,
 		Description: categoryProduct.Description,
 	}, nil
@@ -71,7 +71,7 @@ func (c *categoryProductService) FindById(id string) (
 	}
 
 	return &payload.CategoryProduct{
-		Id: categoryProduct.Id.String(),
+		Id: categoryProduct.Id.Hex(),
 		CategoryName: categoryProduct.CategoryName,
 		Description: categoryProduct.Description,
 	}, nil
