@@ -14,4 +14,4 @@ COPY . .
 
 RUN CGO_ENABLED=0;
 
-CMD ["go", "test", "-v", "./implementation/repository/..."]
+CMD ["go", "test", "-v", "./implementation/repository/...", "./implementation/service/..."]
