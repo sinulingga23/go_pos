@@ -10,6 +10,7 @@ import (
 	"github.com/sinulingga23/go-pos/definition"
 	"github.com/sinulingga23/go-pos/implementation/repository"
 	"github.com/sinulingga23/go-pos/payload"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 
@@ -122,7 +123,7 @@ func TestCategoryProductService_Create_IsThereFieldsEmptyAndNot(t *testing.T) {
 	}
 }
 
-func TestCategortProductService_FindById_Exists(t *testing.T) {
+func TestCategoryProductService_FindById_Exists(t *testing.T) {
 	ctx := context.TODO()
 	database, err := config.ConnectToMongoDb(ctx)
 	if err != nil {
@@ -165,5 +166,51 @@ func TestCategortProductService_FindById_Exists(t *testing.T) {
 
 	if strings.Compare(wantDescription, currentCategoryProduct.Description) != 0 {
 		log.Fatalf("got %q want %q\n", currentCategoryProduct.Description, wantDescription)
+	}
+}
+
+func TestCategoryProductService_FindById_NotExists(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(repository.CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	wantError1 := definition.ErrDataNotFound
+	wantError2 := definition.ErrDataNotFound
+
+	categoryProductRepository := repository.NewCategoryProductRepository(database)
+	categoryProductService := NewCategoryProductService(categoryProductRepository)
+
+	_, err1 := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Pinjaman",
+		Description: "Butuhan membayar pinjaman atau mengajukan angsuran ? Di sini tempatnya.",
+	})
+	if err1 != nil {
+		log.Fatal(err1.Error())
+	}
+
+	_, err2 := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Kesehatan",
+		Description: "Menyediakan berbagai macam jenis obat.",
+	})
+	if err2 != nil {
+		log.Fatal(err2.Error())
+	}
+
+	_, err1 = categoryProductService.FindById(primitive.NewObjectID().Hex())
+	_, err2 = categoryProductService.FindById(primitive.NewObjectID().Hex())
+
+	if wantError1 != err1 {
+		log.Fatalf("got %q want %q\n", err1.Error(), wantError1.Error())
+	}
+
+	if wantError2 != err2 {
+		log.Fatalf("got %q want %q\n", err2.Error(), wantError2.Error())
 	}
 }
