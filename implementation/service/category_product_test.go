@@ -293,6 +293,7 @@ func TestCategoryProductService_UpdateById_Success(t *testing.T) {
 		CategoryName: "Elektronik",
 		Description: "Menyediakan berbagai macam kebutuhan elekronik, mulai dari laptop, speaker, sampai smartphone.",
 	})
+	log.Println("sini", err)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -372,5 +373,68 @@ func TestCategoryProductService_DeleteById(t *testing.T) {
 	err2 := categoryProductService.DeleteById(createdCategoryProduct2.Id)
 	if err2 != nil {
 		log.Printf("got %v want %v\n", err2.Error(), nil)
+	}
+}
+
+func TestCategoryProductService_FindAll_Success(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(repository.CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	categoryProductRepository := repository.NewCategoryProductRepository(database)
+	categoryProductService := NewCategoryProductService(categoryProductRepository)
+
+	createdCategoryProduct1, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Fashion",
+		Description: "Semua kebutuahn style mu ada di sini.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct2, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Kesehatan",
+		Description: "Menyediakan obat - obatan.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct3, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Makanan & Minuman",
+		Description: "Menyediakan kebutuhan makanan & minuman yang sangat lengkap.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	wantCategoryProducts := []*payload.CategoryProduct{
+		createdCategoryProduct1,
+		createdCategoryProduct2,
+		createdCategoryProduct3,
+	}
+
+	categoryProducts, err := categoryProductService.FindAll()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	wantLengthData := len(wantCategoryProducts)
+
+	if wantLengthData != len(categoryProducts)  {
+		log.Fatalf("got %q want %q\n", len(categoryProducts), len(wantCategoryProducts))
+	}
+
+	for i := 0; i < wantLengthData; i++ {
+		if strings.Compare(wantCategoryProducts[i].Id, categoryProducts[i].Id) != 0 {
+			log.Fatalf("got %q want %q\n", categoryProducts[i].Id, wantCategoryProducts[i].Id)
+		}
 	}
 }

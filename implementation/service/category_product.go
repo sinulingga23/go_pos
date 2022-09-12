@@ -151,7 +151,7 @@ func (c *categoryProductService) FindAll() ([]*payload.CategoryProduct, error) {
 	result := make([]*payload.CategoryProduct, 0)
 	for _,categoryProduct := range categoryProducts {
 		result = append(result, &payload.CategoryProduct{
-			Id: categoryProduct.Id.String(),
+			Id: categoryProduct.Id.Hex(),
 			CategoryName: categoryProduct.CategoryName,
 			Description: categoryProduct.Description,
 		})
