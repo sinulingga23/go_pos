@@ -332,3 +332,45 @@ func TestCategoryProductService_UpdateById_Success(t *testing.T) {
 		log.Fatalf("got %q want %q\n", updatedCategoryProduct3.Description, wantDescription3)
 	}
 }
+
+func TestCategoryProductService_DeleteById(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(repository.CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	categoryProductRepository := repository.NewCategoryProductRepository(database)
+	categoryProductService := NewCategoryProductService(categoryProductRepository)
+
+	createdCategoryProduct1, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Kesehatan",
+		Description: "Menyediakan berbagai macam kebutuhan obat - obatan.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct2, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Hiburan",
+		Description: "Kebutuhan hiburanmu ada disini!.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err1 := categoryProductService.DeleteById(createdCategoryProduct1.Id)
+	if err1 != nil {
+		log.Printf("got %v want %v\n", err1.Error(), nil)
+	}
+
+	err2 := categoryProductService.DeleteById(createdCategoryProduct2.Id)
+	if err2 != nil {
+		log.Printf("got %v want %v\n", err2.Error(), nil)
+	}
+}
