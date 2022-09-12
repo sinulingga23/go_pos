@@ -118,7 +118,7 @@ func (c *categoryProductService) UpdateById(id string, updateCategoryProductRequ
 	}
 
 	return &payload.CategoryProduct{
-		Id: updatedCategoryProduct.Id.String(),
+		Id: updatedCategoryProduct.Id.Hex(),
 		CategoryName: updateCategoryProductRequest.CategoryName,
 		Description: updateCategoryProductRequest.Description,
 	}, nil

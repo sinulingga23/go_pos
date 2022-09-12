@@ -214,3 +214,121 @@ func TestCategoryProductService_FindById_NotExists(t *testing.T) {
 		log.Fatalf("got %q want %q\n", err2.Error(), wantError2.Error())
 	}
 }
+
+func TestCategoryProductService_UpdateById_Success(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.Collection(repository.CategoryProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	wantCategoryName1 := "Kesehatan"
+	wantDescription1 := "Menyediakan berbagai macam kebutuhan obat."
+
+	wantCategoryName2 := "Elektronik"
+	wantDescription2 := "Menyediakan berbagai macam kebutuhan elekronik, mulai dari laptop, speaker, sampai smartphone."
+
+	wantCategoryName3 := "Pinjaman"
+	wantDescription3 := "Menyediakan pembayaran instan sesuai kebutuhanmu."
+
+	categoryProductRepository := repository.NewCategoryProductRepository(database)
+	categoryProductService := NewCategoryProductService(categoryProductRepository)
+
+	createdCategoryProduct1, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Ksehatan",
+		Description: "Menyediakan brbgagai macam keubuthan obat.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	
+	createdCategoryProduct2, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Elektroniksa",
+		Description: "Menyediakan brbgagai.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct3, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Pinjamanm",
+		Description: "Menyediakan pembayaran instan sesuai kebutuhanmu...",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	wantId1 := createdCategoryProduct1.Id
+
+	updatedCategoryProduct1, err := categoryProductService.UpdateById(createdCategoryProduct1.Id, payload.UpdateCategoryProductRequest{
+		Id: createdCategoryProduct1.Id,
+		CategoryName: "Kesehatan",
+		Description: "Menyediakan berbagai macam kebutuhan obat.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if strings.Compare(wantId1, updatedCategoryProduct1.Id) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct1.Id, wantId1)
+	}
+
+	if strings.Compare(wantCategoryName1, updatedCategoryProduct1.CategoryName) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct1.CategoryName, wantCategoryName1)
+	}
+
+	if strings.Compare(wantDescription1, updatedCategoryProduct1.Description) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct1.Description, wantDescription1)
+	}
+
+	wantId2 := createdCategoryProduct2.Id
+
+	updatedCategoryProduct2, err := categoryProductService.UpdateById(createdCategoryProduct2.Id, payload.UpdateCategoryProductRequest{
+		Id: createdCategoryProduct2.Id,
+		CategoryName: "Elektronik",
+		Description: "Menyediakan berbagai macam kebutuhan elekronik, mulai dari laptop, speaker, sampai smartphone.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if strings.Compare(wantId2, updatedCategoryProduct2.Id) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct2.Id, wantId2)
+	}
+
+	if strings.Compare(wantCategoryName2, updatedCategoryProduct2.CategoryName) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct2.CategoryName, wantCategoryName2)
+	}
+
+	if strings.Compare(wantDescription2, updatedCategoryProduct2.Description) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct2.Description, wantDescription2)
+	}
+
+	wantId3 := createdCategoryProduct3.Id
+
+	updatedCategoryProduct3, err := categoryProductService.UpdateById(createdCategoryProduct3.Id, payload.UpdateCategoryProductRequest{
+		Id: createdCategoryProduct3.Id,
+		CategoryName: "Pinjaman",
+		Description: "Menyediakan pembayaran instan sesuai kebutuhanmu.",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	
+	if strings.Compare(wantId3, updatedCategoryProduct3.Id) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct3.Id, wantId3)
+	}
+
+	if strings.Compare(wantCategoryName3, updatedCategoryProduct3.CategoryName) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct3.CategoryName, wantCategoryName3)
+	}
+
+	if strings.Compare(wantDescription3, updatedCategoryProduct3.Description) != 0 {
+		log.Fatalf("got %q want %q\n", updatedCategoryProduct3.Description, wantDescription3)
+	}
+}
