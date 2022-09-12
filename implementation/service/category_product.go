@@ -118,7 +118,7 @@ func (c *categoryProductService) UpdateById(id string, updateCategoryProductRequ
 	}
 
 	return &payload.CategoryProduct{
-		Id: updatedCategoryProduct.Id.String(),
+		Id: updatedCategoryProduct.Id.Hex(),
 		CategoryName: updateCategoryProductRequest.CategoryName,
 		Description: updateCategoryProductRequest.Description,
 	}, nil
@@ -151,7 +151,7 @@ func (c *categoryProductService) FindAll() ([]*payload.CategoryProduct, error) {
 	result := make([]*payload.CategoryProduct, 0)
 	for _,categoryProduct := range categoryProducts {
 		result = append(result, &payload.CategoryProduct{
-			Id: categoryProduct.Id.String(),
+			Id: categoryProduct.Id.Hex(),
 			CategoryName: categoryProduct.CategoryName,
 			Description: categoryProduct.Description,
 		})

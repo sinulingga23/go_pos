@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,11 +28,5 @@ func ConnectToMongoDb(ctx context.Context) (*mongo.Database, error) {
 		return nil, err
 	}
 
-	// defer func() {
-	// 	if err = client.Disconnect(ctx); err != nil {
-	// 		panic(err)
-	// 	}
-	// }()
-	log.Printf("[DATABASE]: Connect successfully to MongoDB!\n")
 	return database, nil
 }
