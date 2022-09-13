@@ -39,6 +39,7 @@ func main() {
 	router.Use(middleware.Logger)
 
 	router.Post("/api/v1/category-product", handler.CreateCategoryProduct)
+	router.Get("/api/v1/category-product/{id}", handler.FindCategoryById)
 
 	log.Printf("Running on :8085")
 
