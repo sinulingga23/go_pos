@@ -40,8 +40,9 @@ func main() {
 
 	router.Post("/api/v1/category-product", handler.CreateCategoryProduct)
 	router.Get("/api/v1/category-product/{id}", handler.FindCategoryById)
+	router.Put("/api/v1/category-product/{id}", handler.UpdateCategoryProductById)
 
-	log.Printf("Running on :8085")
+	log.Print("Running on :8085\n")
 
 	if err := http.ListenAndServe(":8085", router); err != nil {
 		log.Fatalf("[ERROR:] %s\v", err)
