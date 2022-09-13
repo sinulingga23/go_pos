@@ -51,24 +51,19 @@ func (h handler) CreateCategoryProduct(w http.ResponseWriter, r *http.Request) {
 	createdCategoryProduct, err := h.categoryProductService.Create(createCategoryProductRequest)
 	if err != nil {
 		log.Printf("[ERROR]: %v\n", err)
-		if err == definition.ErrBadRequest {
-			response := struct {
-				Message string `json:"message"`
-			}{Message: err.Error()}
-	
-			bytes, _ := json.Marshal(response)
-
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(bytes)
-			return
-		}
-
+		
 		response := struct {
 			Message string `json:"message"`
 		}{Message: err.Error()}
 
 		bytes, _ := json.Marshal(response)
 
+		if err == definition.ErrBadRequest {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(bytes)
+			return
+		}
+		
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(bytes)
 		return
