@@ -11,6 +11,7 @@ services:
     depends_on:
       - mongodb_test
     build:
+      context: ./usr/src/app
       dockerfile: Dockerfile.test
     env_file:
       - .env_test
