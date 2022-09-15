@@ -128,6 +128,10 @@ func (c *categoryProductService) DeleteById(id string, deleteCategoryProductRequ
 	if strings.Compare(id, deleteCategoryProductRequest.Id) != 0 {
 		return definition.ErrBadRequest
 	}
+
+	if len(strings.Trim(id, " ")) == 0 || len(strings.Trim(deleteCategoryProductRequest.Id, " ")) == 0 {
+		return definition.ErrBadRequest
+	}
 	
 	idOID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

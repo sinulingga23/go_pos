@@ -365,6 +365,22 @@ func TestCategoryProductService_DeleteById(t *testing.T) {
 		log.Fatal(err.Error())
 	}
 
+	createdCategoryProduct3, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Fashion",
+		Description: "Menyediakan kebutuhan fasion terkini",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	createdCategoryProduct4, err := categoryProductService.Create(payload.CreateCategoryProductRequest{
+		CategoryName: "Pinjaman",
+		Description: "Menyediakan metode pembayaran pinjaman yang paling murah !",
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	err1 := categoryProductService.DeleteById(createdCategoryProduct1.Id, payload.DeleteCategoryProductRequest{
 		Id: createdCategoryProduct1.Id,
 	})
@@ -378,6 +394,28 @@ func TestCategoryProductService_DeleteById(t *testing.T) {
 	if err2 != nil {
 		log.Printf("got %v want %v\n", err2.Error(), nil)
 	}
+
+	err3 := categoryProductService.DeleteById(createdCategoryProduct3.Id, payload.DeleteCategoryProductRequest{
+		Id: "    ",
+	})
+	if err3 != definition.ErrBadRequest {
+		log.Printf("got %q want %q\n", err3.Error(), definition.ErrBadRequest.Error())
+	}
+
+	err4 := categoryProductService.DeleteById("     ", payload.DeleteCategoryProductRequest{
+		Id: createdCategoryProduct4.Id,
+	})
+	if err4 != definition.ErrBadRequest {
+		log.Printf("got %q want %q\n", err4.Error(), definition.ErrBadRequest.Error())
+	}
+
+	err5 := categoryProductService.DeleteById("     ", payload.DeleteCategoryProductRequest{
+		Id: " ",
+	})
+	if err5 != definition.ErrBadRequest {
+		log.Printf("got %q want %q\n", err5.Error(), definition.ErrBadRequest.Error())
+	}
+
 }
 
 func TestCategoryProductService_FindAll_Success(t *testing.T) {
