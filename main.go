@@ -41,6 +41,7 @@ func main() {
 	router.Post("/api/v1/category-product", handler.CreateCategoryProduct)
 	router.Get("/api/v1/category-product/{id}", handler.FindCategoryById)
 	router.Put("/api/v1/category-product/{id}", handler.UpdateCategoryProductById)
+	router.Delete("/api/v1/category-product/{id}", handler.DeleteCategoryProductById)
 
 	log.Print("Running on :8085\n")
 

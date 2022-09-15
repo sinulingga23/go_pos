@@ -17,4 +17,8 @@ type (
 		CategoryName string `json:"categoryName"`
 		Description string `json:"description"`
 	}
+
+	DeleteCategoryProductRequest struct {
+		Id string `json:"id"`
+	}
 )

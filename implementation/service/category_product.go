@@ -124,7 +124,11 @@ func (c *categoryProductService) UpdateById(id string, updateCategoryProductRequ
 	}, nil
 }
 
-func (c *categoryProductService) DeleteById(id string) error {
+func (c *categoryProductService) DeleteById(id string, deleteCategoryProductRequest payload.DeleteCategoryProductRequest) error {
+	if strings.Compare(id, deleteCategoryProductRequest.Id) != 0 {
+		return definition.ErrBadRequest
+	}
+	
 	idOID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return definition.ErrBadRequest

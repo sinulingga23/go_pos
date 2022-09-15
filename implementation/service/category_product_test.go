@@ -365,12 +365,16 @@ func TestCategoryProductService_DeleteById(t *testing.T) {
 		log.Fatal(err.Error())
 	}
 
-	err1 := categoryProductService.DeleteById(createdCategoryProduct1.Id)
+	err1 := categoryProductService.DeleteById(createdCategoryProduct1.Id, payload.DeleteCategoryProductRequest{
+		Id: createdCategoryProduct1.Id,
+	})
 	if err1 != nil {
 		log.Printf("got %v want %v\n", err1.Error(), nil)
 	}
 
-	err2 := categoryProductService.DeleteById(createdCategoryProduct2.Id)
+	err2 := categoryProductService.DeleteById(createdCategoryProduct2.Id, payload.DeleteCategoryProductRequest{
+		Id: createdCategoryProduct2.Id,
+	})
 	if err2 != nil {
 		log.Printf("got %v want %v\n", err2.Error(), nil)
 	}

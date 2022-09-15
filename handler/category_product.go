@@ -15,6 +15,7 @@ var (
 	messageSuccessCreateCategoryProduct string = "Success to create a category product."
 	messageSuccesFindCategoryProduct string = "Success to found the category product."
 	messageSuccesUpdateCategoryProduct string = "Success to update the category product."
+	messageSuccesDeleteCategoryProduct string = "Success to delete the category product."
 )
 
 
@@ -186,6 +187,57 @@ func (h handler) UpdateCategoryProductById(w http.ResponseWriter, r *http.Reques
 	}{Message: messageSuccesUpdateCategoryProduct, Data: *updatedCategoryProduct}
 
 	bytes, _ = json.Marshal(response)
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
+	return
+}
+
+func (h handler) DeleteCategoryProductById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	
+	id := chi.URLParam(r, "id")
+
+	deleteCategoryProductRequest := payload.DeleteCategoryProductRequest{}
+	bytes, _ := ioutil.ReadAll(r.Body)
+	if err := json.Unmarshal(bytes, &deleteCategoryProductRequest); err != nil {
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+		bytes, _ := json.Marshal(response)
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(bytes)
+		return
+	}
+	
+	if err := h.categoryProductService.DeleteById(id, deleteCategoryProductRequest); err != nil {
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+		bytes, _ := json.Marshal(response)
+
+		if err == definition.ErrBadRequest {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(bytes)
+			return
+		}
+
+		if err == definition.ErrDataNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write(bytes)
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(bytes)
+		return
+	}
+
+	response := struct {
+		Message string `json:"message"`
+	}{Message: messageSuccesDeleteCategoryProduct}
+	bytes, _ = json.Marshal(response)
+
 	w.WriteHeader(http.StatusOK)
 	w.Write(bytes)
 	return
