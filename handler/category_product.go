@@ -21,6 +21,8 @@ var (
 
 
 func (h handler) CreateCategoryProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+
 	createCategoryProductRequest := payload.CreateCategoryProductRequest{}
 
 	bytes, err := ioutil.ReadAll(r.Body)
@@ -85,6 +87,8 @@ func (h handler) CreateCategoryProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h handler) FindCategoryById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+
 	id := chi.URLParam(r, "id")
 
 	currentCategoryProduct, err := h.categoryProductService.FindById(id)
@@ -126,6 +130,8 @@ func (h handler) FindCategoryById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h handler) UpdateCategoryProductById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	
 	id := chi.URLParam(r, "id")
 	updateCategoryProductRequest := payload.UpdateCategoryProductRequest{}
 
