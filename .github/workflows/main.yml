@@ -15,11 +15,11 @@ jobs:
       
       - name: Create .env_test
         run: |
-          echo ${{ secrets.MONGO_DB_USER }} > .env_file
-          echo ${{ secrets.MONGO_DB_PASSWORD }} > .env_file
-          echo ${{ secrets.MONGO_DB_HOST }} > .env_file
-          echo ${{ secrets.MONGO_DB_PORT }} > .env_file
-          echo ${{ secrets.MONGO_DB_NAME }} > .env_file
+          echo ${{ secrets.MONGO_DB_USER }} > .env_test
+          echo ${{ secrets.MONGO_DB_PASSWORD }} > .env_test
+          echo ${{ secrets.MONGO_DB_HOST }} > .env_test
+          echo ${{ secrets.MONGO_DB_PORT }} > .env_test
+          echo ${{ secrets.MONGO_DB_NAME }} > .env_test
 
       - name: Run integration test
         run: docker-compose -f docker-compose-test.yml up --build -d
