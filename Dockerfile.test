@@ -12,6 +12,4 @@ RUN go mod download && go mod verify && go clean -testcache
 
 COPY . .
 
-RUN CGO_ENABLED=0;
-
 CMD ["go", "test", "-v", "./implementation/repository/...", "./implementation/service/..."]
