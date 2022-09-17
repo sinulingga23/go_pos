@@ -8,10 +8,19 @@ jobs:
   integration_test:
     name: Integration Test
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
       
+      - name: Create .env_test
+        run: |
+          echo ${{ secrets.MONGO_DB_USER }} > .env_file
+          echo ${{ secrets.MONGO_DB_PASSWORD }} > .env_file
+          echo ${{ secrets.MONGO_DB_HOST }} > .env_file
+          echo ${{ secrets.MONGO_DB_PORT }} > .env_file
+          echo ${{ secrets.MONGO_DB_NAME }} > .env_file
+
       - name: Run integration test
         run: docker-compose -f docker-compose-test.yml up --build -d
         
