@@ -9,3 +9,4 @@ COPY . .
 RUN go build -o go_pos .
 
 CMD ["./go_pos"]
+EXPOSE 8081
