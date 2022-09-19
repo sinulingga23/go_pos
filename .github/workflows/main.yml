@@ -17,8 +17,7 @@ jobs:
         run: |
           echo ${{ secrets.MONGO_DB_USER }} > .env_test
           echo ${{ secrets.MONGO_DB_PASSWORD }} > .env_test
-          echo ${{ secrets.MONGO_DB_HOST }} > .env_test
-          echo ${{ secrets.MONGO_DB_PORT }} > .env_test
+          echo ${{ secrets.MONGO_DB_CLUSTER}} > .env_test
           echo ${{ secrets.MONGO_DB_NAME }} > .env_test
 
       - name: Run integration test
