@@ -46,7 +46,7 @@ func main() {
 
 	log.Print("Running on :8081\n")
 
-	if err := http.ListenAndServe(":8081", router); err != nil {
+	if err := http.ListenAndServe("0.0.0.0:8081", router); err != nil {
 		log.Fatalf("[ERROR:] %s\v", err)
 	}
 }
