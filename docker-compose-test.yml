@@ -6,6 +6,8 @@ services:
     restart: always
     volumes:
       - mongodb_test:/home/db/mongo
+    env_file:
+      - .env_test
   backend_test:
     container_name: backend_test
     depends_on:
