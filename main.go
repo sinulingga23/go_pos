@@ -44,9 +44,9 @@ func main() {
 	router.Delete("/api/v1/category-product/{id}", handler.DeleteCategoryProductById)
 	router.Get("/api/v1/category-product", handler.GetAllCategoryProduct)
 
-	log.Print("Running on :8085\n")
+	log.Print("Running on :8081\n")
 
-	if err := http.ListenAndServe(":8085", router); err != nil {
+	if err := http.ListenAndServe(":8081", router); err != nil {
 		log.Fatalf("[ERROR:] %s\v", err)
 	}
 }
