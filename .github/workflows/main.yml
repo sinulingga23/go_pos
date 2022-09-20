@@ -15,10 +15,10 @@ jobs:
       
       - name: Create .env_test
         run: |
-          echo ${{ secrets.MONGO_DB_USER }} > .env_test
-          echo ${{ secrets.MONGO_DB_PASSWORD }} > .env_test
-          echo ${{ secrets.MONGO_DB_CLUSTER}} > .env_test
-          echo ${{ secrets.MONGO_DB_NAME }} > .env_test
+          echo "${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" > .env_test
+          echo "${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" > .env_test
+          echo "${{ secrets.MONGO_DB_URI }}" > .env_test
+          echo "${{ secrets.MONGO_DB_NAME }}" > .env_test
 
       - name: Run integration test
         run: docker-compose -f docker-compose-test.yml up --build -d
@@ -27,19 +27,10 @@ jobs:
     name: Push Docker image to Docker Hub
     needs: integration_test
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-      
-      - name: Create .env_production
-        run: |
-          echo "${{ secrets.MONGO_DB_USER }}" > .env_production
-          echo "${{ secrets.MONGO_DB_PASSWORD }}" > .env_production
-          echo "${{ secrets.MONGO_DB_HOST }}" > .env_production
-          echo "${{ secrets.MONGO_DB_PORT }}" > .env_production
-          echo "${{ secrets.MONGO_DB_NAME }}" > .env_production
-      
+
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
@@ -56,7 +47,6 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
-          dockerfile: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
