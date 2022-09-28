@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"strings"
 	"testing"
 
@@ -99,5 +100,71 @@ func TestProductRepository_Create_Success(t *testing.T) {
 
 	if len(wantUrlImages) != len(createdProduct.UrlImages) {
 		t.Fatalf("got %v want %v\n", len(createdProduct.UrlImages), len(wantUrlImages))
+	}
+}
+
+func TestProductRepository_AddUrlImageToProduct_Success(t *testing.T) {
+	ctx := context.TODO()
+	database, err := config.ConnectToMongoDb(ctx)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer func() {
+		if err := database.Client().Disconnect(ctx); err != nil {
+			t.Fatal(err.Error())
+		}
+	}()
+
+	_, err = database.Collection(ProductCollection).DeleteMany(ctx, struct {}{})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	categoryProductRepository := NewCategoryProductRepository(database)
+	productRepository := NewProductRepository(database)
+
+	createdCategoryProduct, err := categoryProductRepository.Create(ctx, domain.CategoryProduct{
+		Id: primitive.NewObjectID(),
+		CategoryName: "Otomotif",
+		Description: "Semua kebutuhan otomotifmu ada disini",
+	})
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	createdProduct, err := productRepository.Create(ctx, domain.Product{
+		Id: primitive.NewObjectID(),
+		CategoryProductIds: []primitive.ObjectID{
+			createdCategoryProduct.Id,
+		},
+		ProductName: "Kawasaki KLX 150 BF SE - 2022 / Warna Merah",
+		Description: "Sangat pas untuk kamu yang menyukai tantangan!.",
+		Stock: 12,
+		Price: 43000000,
+		UrlImages: []domain.UrlImage{},
+	})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if err := productRepository.AddUrlImageToProduct(ctx, createdProduct.Id, domain.UrlImage{
+		UrlImageId: primitive.NewObjectID(),
+		Url: "https://storage.dump.com/link/to-the-file1.jpg",
+	}); err != nil {
+		t.Fatalf("got %v want %v", err.Error(), nil)
+	}
+
+	if err := productRepository.AddUrlImageToProduct(ctx, createdProduct.Id, domain.UrlImage{
+		UrlImageId: primitive.NewObjectID(),
+		Url: "https://storage.dump.com/link/to-the-file2.jpg",
+	}); err != nil {
+		t.Fatalf("got %v want %v", err.Error(), nil)	
+	}
+
+	if err := productRepository.AddUrlImageToProduct(ctx, createdProduct.Id, domain.UrlImage{
+		UrlImageId: primitive.NewObjectID(),
+		Url: "https://storage.dump.com/link/to-the-file3.jpg",
+	}); err != nil {
+		t.Fatalf("got %v want %v", err.Error(), nil)	
 	}
 }
