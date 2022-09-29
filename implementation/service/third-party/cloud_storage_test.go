@@ -3,9 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
-	"path"
 	"testing"
 	"time"
 
@@ -15,11 +13,6 @@ import (
 )
 
 func TestCloudStorageService_AddFile_Success(t *testing.T) {
-	dir, err := os.Executable()
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	log.Println("dir", dir, path.Dir(dir))
 	storageCredentialFile := os.Getenv("STORAGE_CREDENTIAL_FILE")
 	client, err := storage.NewClient(context.TODO(), option.WithCredentialsFile(storageCredentialFile))
 	if err != nil {
