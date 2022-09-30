@@ -7,5 +7,5 @@ import (
 )
 
 type CloudStorageService interface {
-	AddFile(ctx context.Context, bucketName string, cloudStorage payload.CloudStorage) (string, error)
+	AddFile(ctx context.Context, cloudStorage payload.CloudStorage) (string, error)
 }
