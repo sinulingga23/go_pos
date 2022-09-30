@@ -12,4 +12,4 @@ RUN go mod download && go mod verify && go clean -testcache
 
 COPY . .
 
-CMD ["go", "test", "-v", "./implementation/repository/...", "./implementation/service/..."]
+CMD ["go", "test", "-v", "-count=1", "./implementation/repository/...", "./implementation/service/..."]

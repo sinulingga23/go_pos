@@ -293,7 +293,6 @@ func TestCategoryProductService_UpdateById_Success(t *testing.T) {
 		CategoryName: "Elektronik",
 		Description: "Menyediakan berbagai macam kebutuhan elekronik, mulai dari laptop, speaker, sampai smartphone.",
 	})
-	log.Println("sini", err)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
