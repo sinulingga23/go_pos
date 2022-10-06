@@ -1,3 +1,6 @@
+API Specification
+- https://www.postman.com/final-project-engineering-5/workspace/github-com-sinulingga23-go-pos
+
 Run MongoDB using Docker
 - docker run -e MONGO_INITDB_ROOT_USERNAME=<username> -e MONGO_INITDB_ROOT_PASSWORD=<password> -p 27020:27020 --expose 27020 -d --name mongodb mongo:6.0.1
 
