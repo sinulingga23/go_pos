@@ -58,6 +58,8 @@ func (p productService) Create(createProductRequest payload.CreateProductRequest
 		len(strings.Trim(createProductRequest.Description, " ")) == 0 {
 		return nil, definition.ErrBadRequest
 	}
+	createProductRequest.ProductName = strings.Trim(createProductRequest.ProductName, " ")
+	createProductRequest.Description = strings.Trim(createProductRequest.Description, " ")
 
 	if createProductRequest.Price <= float64(0)  ||
 		createProductRequest.Stock <= 0 {

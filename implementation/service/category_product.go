@@ -27,13 +27,12 @@ func (c *categoryProductService) Create(createCategoryProductRequest payload.Cre
 	*payload.CategoryProduct,
 	error,
 ) {
-	if len(strings.Trim(createCategoryProductRequest.CategoryName, " ")) == 0 {
+	if len(strings.Trim(createCategoryProductRequest.CategoryName, " ")) == 0  || 
+		len(strings.Trim(createCategoryProductRequest.Description, " ")) == 0 {
 		return nil, definition.ErrBadRequest
 	}
-
-	if len(strings.Trim(createCategoryProductRequest.Description, " ")) == 0 {
-		return nil, definition.ErrBadRequest
-	}
+	createCategoryProductRequest.CategoryName = strings.Trim(createCategoryProductRequest.CategoryName, " ")
+	createCategoryProductRequest.Description = strings.Trim(createCategoryProductRequest.Description, " ")
 
 	categoryProduct, err := c.categoryProductRepository.Create(context.TODO(), domain.CategoryProduct{
 		Id: primitive.NewObjectID(),
