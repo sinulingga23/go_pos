@@ -85,13 +85,12 @@ func (c *categoryProductService) UpdateById(id string, updateCategoryProductRequ
 		return nil, definition.ErrBadRequest
 	}
 
-	if len(strings.Trim(updateCategoryProductRequest.CategoryName, " ")) == 0 {
+	if len(strings.Trim(updateCategoryProductRequest.CategoryName, " ")) == 0 ||
+		len(strings.Trim(updateCategoryProductRequest.Description, " ")) == 0 {
 		return nil, definition.ErrBadRequest
 	}
-
-	if len(strings.Trim(updateCategoryProductRequest.Description, " ")) == 0 {
-		return nil, definition.ErrBadRequest
-	}
+	updateCategoryProductRequest.CategoryName = strings.Trim(updateCategoryProductRequest.CategoryName, " ")
+	updateCategoryProductRequest.Description = strings.Trim(updateCategoryProductRequest.Description, " ")
 
 	idOID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
