@@ -20,12 +20,26 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		log.Printf("[ProductHandler][r.ParseForm]: %s", err.Error())
+
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+		
+		bytes, _ := json.Marshal(response)
+		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err := r.ParseMultipartForm(r.ContentLength); err != nil {
 		log.Printf("[ProductHandler][r.ParseMultipartForm]: %s", err.Error())
+
+		respnose := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+
+		bytes, _ := json.Marshal(respnose)
+		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -33,6 +47,13 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	stock, err := strconv.Atoi(r.PostFormValue("stock"))
 	if err != nil {
 		log.Printf("[ProductHandler][strconv.Atoi]: %s", err.Error())
+
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+
+		bytes, _ := json.Marshal(response)
+		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -40,6 +61,13 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	price, err := strconv.ParseFloat(r.PostFormValue("price"), 64)
 	if err != nil {
 		log.Printf("[ProductHandler][strconv.ParseFloat]: %s", err.Error())
+
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+
+		bytes, _ := json.Marshal(response)
+		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -56,16 +84,25 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("[ProductHandler][h.productService.Create]: %s", err.Error())
 
+
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+		bytes, _ := json.Marshal(response)
+
 		if err == definition.ErrBadRequest {
+			w.Write(bytes)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		if err == definition.ErrDataNotFound {
+			w.Write(bytes)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
+		w.Write(bytes)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
