@@ -27,4 +27,9 @@ type (
 		Price float64
 		Images map[string][]*multipart.FileHeader
 	}
+
+	AddImageToProductRequest struct {
+		ProudctId string
+		Images map[string][]*multipart.FileHeader
+	}
 )

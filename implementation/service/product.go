@@ -127,6 +127,7 @@ func (p productService) Create(createProductRequest payload.CreateProductRequest
 				FileBytes: bytes,
 			})
 			if err != nil {
+				mu.Unlock()
 				log.Printf("[%v]: %v\n", image.Filename, err.Error())
 				return
 			}
@@ -135,6 +136,7 @@ func (p productService) Create(createProductRequest payload.CreateProductRequest
 				UrlImageId: primitive.NewObjectID(),
 				Url: urlImage,
 			}); err != nil {
+				mu.Unlock()
 				log.Printf("[%v]: %v\n", image.Filename, err.Error())
 				return
 			}
@@ -161,4 +163,69 @@ func (p productService) Create(createProductRequest payload.CreateProductRequest
 		Price: createdProduct.Price,
 		UrlImages: []payload.UrlImage{},
 	}, nil
+}
+
+func (p productService) AddImagesToProduct(productId string, addImageToProductRequest payload.AddImageToProductRequest) error {
+	if strings.Compare(productId, addImageToProductRequest.ProudctId) != 0 ||
+	len(strings.Trim(productId, " ")) == 0 || len(strings.Trim(addImageToProductRequest.ProudctId, " ")) == 0 {
+		return definition.ErrBadRequest
+	}
+	
+	images := addImageToProductRequest.Images["images"]
+	if len(images) == 0 {
+		return definition.ErrBadRequest
+	}
+
+	bucketName := os.Getenv("BUCKET_NAME")
+	var mu sync.Mutex
+	for _, image := range images {
+		go func(image *multipart.FileHeader){
+			theimage, err := image.Open()
+			if err != nil {
+				log.Printf("[%v]: %v\n", image.Filename, err.Error())
+				return
+			}
+			defer theimage.Close()
+
+			bytes, err := io.ReadAll(theimage)
+			if err != nil {
+				log.Printf("[%s]: %s\n", image.Filename, err.Error())
+				return
+			}
+
+			extention := filepath.Ext(image.Filename)
+			fileName := fmt.Sprintf("%v-%s-%s%s", time.Now().Unix(), strings.Split(image.Filename, extention)[0], "sinulingga", extention)
+
+			mu.Lock()
+			urlImage, err := p.cloudStorageService.AddFile(context.TODO(), thirdparty_payload.CloudStorage{
+				BucketName: bucketName,
+				FileName: fileName,
+				FileBytes: bytes,
+			})
+			if err != nil {
+				mu.Unlock()
+				log.Printf("[%s]: %s\n", image.Filename, err.Error())
+				return
+			}
+
+			productOID, err := primitive.ObjectIDFromHex(productId)
+			if err != nil {
+				mu.Unlock()
+				log.Printf("[%s]: %s\n", image.Filename, err.Error())
+				return
+			}
+
+			if err := p.productRepository.AddUrlImageToProduct(context.TODO(), productOID, domain.UrlImage{
+				UrlImageId: primitive.NewObjectID(),
+				Url: urlImage,
+			}); err != nil {
+				mu.Unlock()
+				log.Printf("[%s]: %s\n", image.Filename, err.Error())
+				return
+			}
+			mu.Unlock()
+		}(image)
+	}
+
+	return nil
 }

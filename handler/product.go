@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/sinulingga23/go-pos/definition"
 	"github.com/sinulingga23/go-pos/payload"
 )
@@ -13,6 +14,7 @@ import (
 
 var (
 	messageSuccessCreateProduct string = "Success to create a product."
+	messageAddImagesInProcess string = "Add Images in Process."
 )
 
 func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
@@ -115,4 +117,53 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(bytes)
 	return
+}
+
+func (h handler) AddImagesToProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+
+	if err := r.ParseMultipartForm(r.ContentLength); err != nil {
+		log.Printf("[ProductHandler][r.ParseMultipartForm]: %s", err.Error())
+		
+		response := struct {
+			Message string `json:"message"`
+		}{Message: err.Error()}
+
+		bytes, _ := json.Marshal(response)
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(bytes)
+		return
+	}
+
+	 productId := chi.URLParam(r, "id")
+	 if err := h.productService.AddImagesToProduct(productId, payload.AddImageToProductRequest{
+		 ProudctId: r.PostFormValue("productId"),
+		 Images: r.MultipartForm.File,
+	 }); err != nil {
+		 log.Printf("[ProductHandler][h.productService.AddImagesToProduct]: %s", err.Error())
+
+		 response := struct {
+			 Message string `json:"message"`
+		 }{Message: err.Error()}
+		 bytes, _ := json.Marshal(response)
+
+		 if err == definition.ErrBadRequest {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(bytes) 
+			return
+		 }
+
+		 w.WriteHeader(http.StatusInternalServerError)
+		 w.Write(bytes)
+		 return
+	 }
+
+	 response := struct {
+		 Message string `json:"message"`
+	 }{Message: messageAddImagesInProcess}
+	 bytes, _ := json.Marshal(response)
+	 w.WriteHeader(http.StatusOK)
+	 w.Write(bytes)
+	 return
 }

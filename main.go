@@ -59,6 +59,7 @@ func main() {
 	router.Get("/api/v1/category-product", handler.GetAllCategoryProduct)
 	
 	router.Post("/api/v1/product", handler.CreateProduct)
+	router.Post("/api/v1/product/{id}/add-images", handler.AddImagesToProduct)
 
 	log.Print("Running on :8081\n")
 
