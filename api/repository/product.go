@@ -10,4 +10,5 @@ import (
 type ProductRepository interface {
 	Create(ctx context.Context, product domain.Product) (*domain.Product, error)
 	AddUrlImageToProduct(ctx context.Context, id primitive.ObjectID, imageUrl domain.UrlImage) error
+	FindAll(ctx context.Context) ([]*domain.Product, error)
 }

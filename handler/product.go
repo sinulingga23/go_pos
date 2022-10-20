@@ -15,6 +15,7 @@ import (
 var (
 	messageSuccessCreateProduct string = "Success to create a product."
 	messageAddImagesInProcess string = "Add Images in Process."
+	messageSuccessGetAllProduct string = "Success to get all the product."
 )
 
 func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
@@ -28,8 +29,8 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}{Message: err.Error()}
 		
 		bytes, _ := json.Marshal(response)
-		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(bytes)
 		return
 	}
 
@@ -41,8 +42,8 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}{Message: err.Error()}
 
 		bytes, _ := json.Marshal(respnose)
-		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(bytes)
 		return
 	}
 
@@ -55,8 +56,8 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}{Message: err.Error()}
 
 		bytes, _ := json.Marshal(response)
-		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(bytes)
 		return
 	}
 
@@ -69,8 +70,8 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}{Message: err.Error()}
 
 		bytes, _ := json.Marshal(response)
-		w.Write(bytes)
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(bytes)
 		return
 	}
 
@@ -93,19 +94,19 @@ func (h handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := json.Marshal(response)
 
 		if err == definition.ErrBadRequest {
-			w.Write(bytes)
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(bytes)
 			return
 		}
 
 		if err == definition.ErrDataNotFound {
-			w.Write(bytes)
 			w.WriteHeader(http.StatusNotFound)
+			w.Write(bytes)
 			return
 		}
 
-		w.Write(bytes)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(bytes)
 		return
 	}
 
@@ -166,4 +167,37 @@ func (h handler) AddImagesToProduct(w http.ResponseWriter, r *http.Request) {
 	 w.WriteHeader(http.StatusOK)
 	 w.Write(bytes)
 	 return
+}
+
+func (h handler) GetAllProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+
+	products, err := h.productService.FindAll()
+	if err != nil {
+		log.Printf("[ProductHandler][h.productService.GetAllProduct]: %s", err.Error())
+
+		response := struct {
+			Message string `json:"mesage"`
+		}{Message: err.Error()}	
+		bytes, _ := json.Marshal(response)
+
+		if err == definition.ErrDataNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write(bytes)
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(bytes)
+		return
+	}
+
+	response := struct {
+		Message string `json:"message"`
+		Data []*payload.Product `json:"data"`
+	}{Message: messageSuccessGetAllProduct, Data: products}
+	bytes, _ := json.Marshal(response)
+	w.WriteHeader(http.StatusOK)
+	w.Write(bytes)
+	return
 }

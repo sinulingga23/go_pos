@@ -61,3 +61,30 @@ func (c *productRepository) AddUrlImageToProduct(ctx context.Context, id primiti
 
 	return nil
 }
+
+func (c *productRepository) FindAll(ctx context.Context) ([]*domain.Product, error) {
+	collection := c.database.Collection(ProductCollection)
+	cursor, err := collection.Find(ctx, struct {}{})
+	if err != nil {
+		log.Printf("[DATABASE]: %s\n", err.Error())
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	products := make([]*domain.Product, 0)
+	for cursor.Next(ctx) {
+		product := &domain.Product{}
+		if err := cursor.Decode(product); err != nil {
+			log.Printf("[DATABASE]: %s\n", err.Error())
+			return nil, err
+		}
+
+		products = append(products, product)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}

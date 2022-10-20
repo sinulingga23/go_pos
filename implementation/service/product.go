@@ -229,3 +229,72 @@ func (p productService) AddImagesToProduct(productId string, addImageToProductRe
 
 	return nil
 }
+
+func (p productService) FindAll() ([]*payload.Product, error) {
+	products, err := p.productRepository.FindAll(context.TODO())
+	if err != nil {
+		return nil, definition.ErrInternalServer
+	}
+
+	if len(products) == 0 {
+		return nil, definition.ErrDataNotFound
+	}
+
+	categoryProductIds := []primitive.ObjectID{}
+	mapVisited := map[string]bool{}
+	for _, product := range products {
+		for _, categoryProductId := range product.CategoryProductIds {
+			_, exists := mapVisited[categoryProductId.Hex()]
+			if !exists {
+				categoryProductIds = append(categoryProductIds, categoryProductId)
+				mapVisited[categoryProductId.Hex()] = true
+			}
+		}
+	}
+
+	categoryProducts, err := p.categoryProdductRepositry.FindByIds(context.TODO(), categoryProductIds)
+	if err != nil {
+		return nil, definition.ErrInternalServer
+	}
+
+	mapCategoryProducts := map[string]payload.CategoryProduct{}
+	for _, categoryProduct := range categoryProducts {
+		mapCategoryProducts[categoryProduct.Id.Hex()] = payload.CategoryProduct{
+			Id: categoryProduct.Id.Hex(),
+			CategoryName: categoryProduct.CategoryName,
+			Description: categoryProduct.Description,
+		}
+	}
+
+	result := make([]*payload.Product, 0)
+	for _, product := range products {
+
+		categoryProducts := []payload.CategoryProduct{}
+		for _, categoryProductId := range product.CategoryProductIds {
+			categoryProduct, exists := mapCategoryProducts[categoryProductId.Hex()]
+			if exists {
+				categoryProducts = append(categoryProducts, categoryProduct)
+			}
+		}
+
+		urlImages := []payload.UrlImage{}
+		for _, urlImage := range product.UrlImages {
+			urlImages = append(urlImages, payload.UrlImage{
+				UrlImageId: urlImage.UrlImageId.Hex(),
+				Url: urlImage.Url,
+			})
+		}
+
+		result = append(result, &payload.Product{
+			Id: product.Id.Hex(),
+			CategoryProducts: categoryProducts,
+			ProductName: product.ProductName,
+			Description: product.Description,
+			Stock: product.Stock,
+			Price: product.Price,
+			UrlImages: urlImages,
+		})
+	}
+
+	return result, nil
+}

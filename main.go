@@ -60,6 +60,7 @@ func main() {
 	
 	router.Post("/api/v1/product", handler.CreateProduct)
 	router.Post("/api/v1/product/{id}/add-images", handler.AddImagesToProduct)
+	router.Get("/api/v1/product", handler.GetAllProduct)
 
 	log.Print("Running on :8081\n")
 
